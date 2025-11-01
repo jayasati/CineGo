@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { assets } from '../assets/assets';
-import { Link } from 'react-router-dom';
-import { MenuIcon, SearchIcon, XIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { MenuIcon, SearchIcon, TicketPlus, XIcon } from 'lucide-react';
+import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+
+  const {user}=useUser()
+  const {openSignIn}=useClerk()
+  const navigate=useNavigate()
 
   return (
     <div className="fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5 bg-black/80 backdrop-blur-md">
@@ -84,9 +89,25 @@ const Navbar = () => {
       {/* Right Section */}
       <div className="flex items-center gap-6">
         <SearchIcon className="max-md:hidden w-6 h-6 text-white cursor-pointer" />
-        <button className="px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer text-white">
-          Login
-        </button>
+        {!user ? (
+          <button
+            onClick={() => openSignIn({})}
+            className="px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer text-white"
+          >
+            Login
+          </button>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/my-booking')}
+              className="hidden sm:flex items-center gap-1 text-white hover:text-primary transition"
+            >
+              <TicketPlus width={18} /> My Booking
+            </button>
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        )}
+
         <MenuIcon
           className="max-md:ml-4 md:hidden w-8 h-8 text-white cursor-pointer"
           onClick={() => setIsOpen(true)}
